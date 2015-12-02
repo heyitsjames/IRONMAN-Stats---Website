@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from bs4 import BeautifulSoup
 from urllib.request import urlopen, HTTPError
-from .models import Race, RaceResult
+from .models import ComputedRaceData, Race, RaceResult
 
 
 class Webdriver:
@@ -105,8 +105,11 @@ class Webdriver:
                             data_url = '{0}race={1}&rd={2}&sex={3}&agegroup={4}&ps=2000'.format(
                                 self.ironman_html_url, race_url_name, race_date, gender, age_group)
                             self.scrape_gender_and_age_group(data_url)
+                    ComputedRaceData.objects.bulk_create(self.race.get_computed_race_data())
+                    print('Computed race results created for race ', self.race)
+
                 else:
-                    print(race_link, 'already scraped')
+                    print(self.race, 'already scraped')
 
     def scrape_gender_and_age_group(self, data_url):
         table_body = self.get_table_from_url(data_url)

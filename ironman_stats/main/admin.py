@@ -1,5 +1,5 @@
 from django.contrib import admin
-from ironman_stats.main.models import Race, RaceResult
+from ironman_stats.main.models import ComputedRaceData, Race, RaceResult
 
 
 class RaceResultAdmin(admin.ModelAdmin):
@@ -12,5 +12,11 @@ class RaceResultAdmin(admin.ModelAdmin):
 class RaceAdmin(admin.ModelAdmin):
     search_fields = ['title']
 
+
+class ComputedRaceDataAdmin(admin.ModelAdmin):
+    list_display = ('race', 'age_group', 'sex')
+
+
 admin.site.register(RaceResult, RaceResultAdmin)
 admin.site.register(Race, RaceAdmin)
+admin.site.register(ComputedRaceData, ComputedRaceDataAdmin)
