@@ -2,6 +2,7 @@ import re
 import json
 from datetime import datetime
 from bs4 import BeautifulSoup
+from urllib.parse import quote, urlsplit
 from urllib.request import urlopen, HTTPError
 from .models import ComputedRaceData, Race, RaceResult
 
@@ -31,7 +32,7 @@ class Webdriver:
         event_urls = soup.select('a.eventDetails')
         event_result_urls = [event_url.attrs['href'] for event_url in event_urls]
 
-        for result_url in event_result_urls:
+        for result_url in reversed(event_result_urls):
             self.scrape_race(result_url)
 
     def scrape_race(self, results_url):
@@ -43,15 +44,15 @@ class Webdriver:
             results_url = results_url.replace('.aspx', '/results.aspx')
 
         try:
-            response = urlopen(results_url).read()
+            split_results_url = results_url.split('www.')
+            response = urlopen('{0}{1}'.format(split_results_url[0],
+                               quote(urlsplit(split_results_url[1]).path))).read()
         except HTTPError:  # no results for this page.
             print("404: ", results_url)
             return
-
         soup = BeautifulSoup(response, 'lxml')
 
         race_years = soup.select('nav.rResultswWrap ul li a')
-
         if race_years:
             race_links = [r.attrs['href'] for r in race_years]
         else:  # This race has only one year of data, and no side menu
@@ -71,7 +72,6 @@ class Webdriver:
             self.scrape_race_year(race_link)
 
     def scrape_race_year(self, race_link):
-
         response = urlopen(race_link).read()
         soup = BeautifulSoup(response, 'lxml')
 
@@ -93,11 +93,12 @@ class Webdriver:
             if self.get_table_from_url(table_url) is not None:
 
                 self.race, created = Race.objects.get_or_create(title=self.race_name,
-                                                                location=self.race_location,
                                                                 distance=self.race_distance,
                                                                 date=datetime.strptime(
                                                                     race_date, '%Y%m%d').date())
                 if created:
+                    self.race.location = self.race_location
+                    self.race.save()
                     for gender in gender_list:
                         for age_group in age_group_list:
                             self.age_group = age_group
