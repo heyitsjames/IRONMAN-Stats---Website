@@ -1,9 +1,11 @@
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 from model_utils import Choices
 
 
 class Race(models.Model):
-    DISTANCES = Choices('half-ironman', 'full-ironman',)
+    DISTANCES = Choices(('half-ironman', _('IRONMAN 70.3')),
+                        ('full-ironman', _('IRONMAN')))
     distance = models.CharField(choices=DISTANCES, max_length=40)
     title = models.CharField(max_length=255)
     date = models.DateField()
@@ -62,10 +64,10 @@ class RaceResult(models.Model):
     division_rank = models.IntegerField(blank=True, null=True,)
     gender_rank = models.IntegerField(blank=True, null=True,)
     overall_rank = models.IntegerField(blank=True, null=True,)
-    swim_time = models.TimeField(blank=True, null=True,)
-    bike_time = models.TimeField(blank=True, null=True,)
-    run_time = models.TimeField(blank=True, null=True,)
-    finish_time = models.TimeField(blank=True, null=True,)
+    swim_time = models.DurationField(blank=True, null=True,)
+    bike_time = models.DurationField(blank=True, null=True,)
+    run_time = models.DurationField(blank=True, null=True,)
+    finish_time = models.DurationField(blank=True, null=True,)
     points = models.IntegerField(blank=True, null=True,)
     race_status = models.CharField(choices=RACE_STATUSES,
                                    default=RACE_STATUSES['Finished'], max_length=40)
@@ -84,7 +86,7 @@ class ComputedRaceData(models.Model):
     race = models.ForeignKey('Race')
     age_group = models.CharField(max_length=255, choices=RaceResult.AGE_GROUPS)
     sex = models.CharField(max_length=1, choices=RaceResult.SEXES)
-    average_swim_time = models.TimeField(blank=True, null=True,)
-    average_bike_time = models.TimeField(blank=True, null=True,)
-    average_run_time = models.TimeField(blank=True, null=True,)
-    average_finish_time = models.TimeField(blank=True, null=True,)
+    average_swim_time = models.DurationField(blank=True, null=True,)
+    average_bike_time = models.DurationField(blank=True, null=True,)
+    average_run_time = models.DurationField(blank=True, null=True,)
+    average_finish_time = models.DurationField(blank=True, null=True,)

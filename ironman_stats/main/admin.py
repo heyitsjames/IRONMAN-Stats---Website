@@ -15,6 +15,7 @@ class RaceAdmin(admin.ModelAdmin):
 
 class ComputedRaceDataAdmin(admin.ModelAdmin):
     list_display = ('race', 'age_group', 'sex')
+    search_fields = ['race__title']
 
 
 admin.site.register(RaceResult, RaceResultAdmin)

@@ -17,8 +17,9 @@ class Webdriver:
         ironman_url = 'http://www.ironman.com/events/triathlon-races.aspx?d=ironman'
         half_ironman_url = 'http://www.ironman.com/events/triathlon-races.aspx?d=ironman+70.3'
         self.ironman_html_url = 'http://www.ironman.com/handlers/eventresults.aspx?'
-        self.ironman_urls = [{'url': ironman_url, 'distance': 'full-ironman'},
-                             {'url': half_ironman_url, 'distance': 'half-ironman'}]
+        # self.ironman_urls = [{'url': ironman_url, 'distance': 'full-ironman'},
+        #                      {'url': half_ironman_url, 'distance': 'half-ironman'}]
+        self.ironman_urls = [{'url': half_ironman_url, 'distance': 'half-ironman'}]
 
     def run(self):
         for url in self.ironman_urls:
@@ -35,13 +36,15 @@ class Webdriver:
         for result_url in reversed(event_result_urls):
             self.scrape_race(result_url)
 
-    def scrape_race(self, results_url):
-        reg = re.compile('.+\/ironman(?:-70.3)?\/[\w\-\']+\/(.+)')
-        extra_data_on_url = reg.findall(results_url)
-        if extra_data_on_url:
-            results_url = results_url.replace(extra_data_on_url[0], 'results.aspx')
-        else:
-            results_url = results_url.replace('.aspx', '/results.aspx')
+    def scrape_race(self, results_url, validate_url=True):
+        print('scraping race: ', results_url)
+        if validate_url:
+            reg = re.compile('.+\/ironman(?:-70.3)?\/[\w\-\']+\/(.+)')
+            extra_data_on_url = reg.findall(results_url)
+            if extra_data_on_url:
+                results_url = results_url.replace(extra_data_on_url[0], 'results.aspx')
+            else:
+                results_url = results_url.replace('.aspx', '/results.aspx')
 
         try:
             split_results_url = results_url.split('www.')
@@ -65,7 +68,7 @@ class Webdriver:
 
             race_links = ['{0}?rd={1}'.format(results_url, race_date)]
 
-        self.race_name = soup.select('#eventDetails h3.eventTitle')[0].text
+        self.race_name = soup.select('#eventDetails h3.eventTitle')[0].text.strip()
         self.race_location = soup.select('#eventDetails h4.eventSubtitle')[0].contents[0].strip()
 
         for race_link in race_links:
