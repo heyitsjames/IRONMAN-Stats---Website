@@ -17,9 +17,8 @@ class Webdriver:
         ironman_url = 'http://www.ironman.com/events/triathlon-races.aspx?d=ironman'
         half_ironman_url = 'http://www.ironman.com/events/triathlon-races.aspx?d=ironman+70.3'
         self.ironman_html_url = 'http://www.ironman.com/handlers/eventresults.aspx?'
-        # self.ironman_urls = [{'url': ironman_url, 'distance': 'full-ironman'},
-        #                      {'url': half_ironman_url, 'distance': 'half-ironman'}]
-        self.ironman_urls = [{'url': half_ironman_url, 'distance': 'half-ironman'}]
+        self.ironman_urls = [{'url': ironman_url, 'distance': 'full-ironman'},
+                             {'url': half_ironman_url, 'distance': 'half-ironman'}]
 
     def run(self):
         for url in self.ironman_urls:
